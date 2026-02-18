@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Master, Service, Client, Appointment
+from .models import Master, Service, Client, Appointment, MasterWork
 
 @admin.register(Master)
 class MasterAdmin(admin.ModelAdmin):
@@ -24,3 +24,9 @@ class AppointmentAdmin(admin.ModelAdmin):
     list_filter = ('status', 'master', 'date_time')
     search_fields = ('client__name', 'client__phone')
     date_hierarchy = 'date_time'
+
+@admin.register(MasterWork)
+class MasterWorkAdmin(admin.ModelAdmin):
+    list_display = ('title', 'master', 'category', 'created_at')
+    list_filter = ('master', 'category', 'body_part')
+    search_fields = ('title', 'description')

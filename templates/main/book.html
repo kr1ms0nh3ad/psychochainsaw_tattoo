@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}「 ЗАПИСЬ НА СЕАНС 」{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h2 class="mb-0">「 ЗАПИСЬ НА СЕАНС 」</h2>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <h4 class="mb-3">личные данные</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            {{ form.client_name.label_tag }}
+                            {{ form.client_name }}
+                            {% if form.client_name.errors %}
+                                <div class="text-danger">{{ form.client_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.client_phone.label_tag }}
+                            {{ form.client_phone }}
+                            {% if form.client_phone.errors %}
+                                <div class="text-danger">{{ form.client_phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.client_email.label_tag }}
+                        {{ form.client_email }}
+                        <small class="text-muted">для отправки подтверждения (необязательно)</small>
+                        {% if form.client_email.errors %}
+                            <div class="text-danger">{{ form.client_email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <h4 class="mb-3 mt-4">детали записи</h4>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            {{ form.service.label_tag }}
+                            {{ form.service }}
+                            {% if form.service.errors %}
+                                <div class="text-danger">{{ form.service.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.master.label_tag }}
+                            {{ form.master }}
+                            {% if form.master.errors %}
+                                <div class="text-danger">{{ form.master.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            {{ form.date.label_tag }}
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                                <div class="text-danger">{{ form.date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.time.label_tag }}
+                            {{ form.time }}
+                            <small class="text-muted">рабочее время: 10:00 - 20:00</small>
+                            {% if form.time.errors %}
+                                <div class="text-danger">{{ form.time.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.notes.label_tag }}
+                        {{ form.notes }}
+                        <small class="text-muted">опишите идею, размер, место на теле</small>
+                        {% if form.notes.errors %}
+                            <div class="text-danger">{{ form.notes.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+                        записаться!
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

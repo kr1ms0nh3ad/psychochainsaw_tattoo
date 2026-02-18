@@ -59,9 +59,9 @@
                         <span class="text-danger">✗ в отпуске</span>
                         {% endif %}
                     </span>
-                    <button class="btn btn-outline-primary btn-sm" onclick="alert('форма записи скоро будет')">
-                        записаться к мастеру
-                    </button>
+                    <a href="{% url 'master_detail' master.id %}" class="btn btn-outline-primary btn-sm w-100">
+                        подробнее о мастере
+                    </a>
                 </div>
             </div>
         </div>

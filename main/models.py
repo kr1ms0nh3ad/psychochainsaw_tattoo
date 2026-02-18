@@ -67,3 +67,22 @@ class Appointment(models.Model):
     class Meta:
         verbose_name = "Запись"
         verbose_name_plural = "Записи"
+
+class MasterWork(models.Model):
+    master = models.ForeignKey(Master, on_delete=models.CASCADE, related_name='portfolio', verbose_name="Мастер")
+    title = models.CharField("Название работы", max_length=200)
+    description = models.TextField("Описание", blank=True, null=True)
+    image = models.ImageField("Фото работы", upload_to='portfolio/')
+    created_at = models.DateTimeField("Дата добавления", auto_now_add=True)
+    category = models.CharField("Категория", max_length=100, blank=True, null=True, 
+                                help_text="Например: реализм, традиция, графика")
+    body_part = models.CharField("Часть тела", max_length=100, blank=True, null=True,
+                                help_text="Например: рука, нога, спина")
+    
+    def __str__(self):
+        return f"{self.title} - {self.master.name}"
+    
+    class Meta:
+        verbose_name = "Работа мастера"
+        verbose_name_plural = "Портфолио мастеров"
+        ordering = ['-created_at']

@@ -18,8 +18,15 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">главная</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'masters' %}">мастера</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'services' %}">услуги</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">записаться</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/">вход (для персонала)</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'book_appointment' %}">записаться</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'master_dashboard' %}">личный кабинет</a></li>
+                        <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}">выйти</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">вход для мастеров</a></li>
+                    {% endif %}
+                
+                    <li class="nav-item"><a class="nav-link" href="/admin/" style="color: rgb(255, 0, 115);">админка</a></li>
                 </ul>
             </div>
         </div>

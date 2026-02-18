@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}「 ЗАПИСЬ СОЗДАНА! 」{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <div class="card-header bg-success text-white">
+                <h3>「 ЗАПИСЬ СОЗДАНА! 」</h3>
+            </div>
+            <div class="card-body">
+                <h4 class="mb-4">благодарим, {{ appointment.client.name }}!</h4>
+                
+                <div class="text-start mb-4">
+                    <p><strong>услуга:</strong> {{ appointment.service.name }}</p>
+                    <p><strong>мастер:</strong> {{ appointment.master.name }}</p>
+                    <p><strong>дата и время:</strong> {{ appointment.date_time|date:"d.m.Y H:i" }}</p>
+                    <p><strong>статус:</strong> <span class="badge bg-warning">ожидает подтверждения</span></p>
+                </div>
+                
+                <p class="text-muted">
+                    мастер свяжется с вами в ближайшее время для подтверждения записи<br>
+                    номер вашей записи: #{{ appointment.id }}
+                </p>
+                
+                <a href="{% url 'index' %}" class="btn btn-primary">вернуться на главную</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
