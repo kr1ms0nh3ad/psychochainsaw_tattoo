@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}「 PSYCHO CHAINSAW 」{% endblock %}
+
+{% block content %}
+    <div class="p-5 mb-4 rounded-3" style="background-image: url('')">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold" style="color: rgb(62, 62, 62);">тату-салон「 PSYCHO CHAINSAW 」</h1>
+            <p class="col-md-8 fs-4" style="color: rgb(62, 62, 62);">приходите ТОЛЬКО К НАМ!</p>
+        </div>
+    </div>
+
+    <h2 class="mb-4">「 НАШИ МАСТЕРА 」</h2>
+    <div class="row mb-5">
+        {% for master in masters %}
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                {% if master.photo %}
+                <img src="{{ master.photo.url }}" class="card-img-top" alt="{{ master.name }}">
+                {% else %}
+                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">Нет фото</div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ master.name }}</h5>
+                    <p class="card-text">{{ master.specialty }}<br>опыт: {{ master.experience }} лет</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>мастеров пока нет</p>
+        {% endfor %}
+    </div>
+
+    <h2 class="mb-4">「 НАШИ УСЛУГИ 」</h2>
+    <div class="row">
+        {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text">{{ service.description|truncatewords:20 }}</p>
+                    <p class="card-text"><strong>{{ service.price }} руб.</strong> | длительность: {{ service.duration }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>пока нет услуг</p>
+        {% endfor %}
+    </div>
+{% endblock %}

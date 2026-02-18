@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}「 УСЛУГИ И ЦЕНЫ 」{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 fw-bold">「 УСЛУГИ И ЦЕНЫ 」</h1>
+        <p class="lead">самое лучшее тату в твоей жизни по вкусной цене</p>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    {% for service in services %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h3 class="card-title h4">{{ service.name }}</h3>
+                    <span class="badge bg-primary rounded-pill fs-6">{{ service.price }} ₽</span>
+                </div>
+                
+                <p class="card-text text-muted">{{ service.description }}</p>
+                
+                <div class="mt-3">
+                    <p class="mb-2">
+                        <strong>длительность:</strong> 
+                        {% if service.duration %}
+                            {{ service.duration|time:"H:i" }} часов
+                        {% else %}
+                            2:00 часа
+                        {% endif %}
+                    </p>
+                    
+                    <p class="mb-2">
+                        <strong>мастера:</strong>
+                        {% for master in service.masters.all %}
+                            <span class="badge bg-secondary">{{ master.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">не указаны</span>
+                        {% endfor %}
+                    </p>
+                </div>
+                
+                <div class="mt-4 small text-success">
+                    в стоимость включено:
+                    <ul class="mt-2">
+                        <li>индивидуальный эскиз</li>
+                        <li>стерильные материалы</li>
+                        <li>обезболивание</li>
+                        <li>средства для ухода</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-transparent border-top-0">
+                <button class="btn btn-primary w-100" onclick="alert('форма записи скоро будет')">
+                    записаться на {{ service.name|lower }}
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            услуг пока у нас ниту
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-12 text-center">
+        <div class="p-5 text-black rounded" style="background-image: url('https://sun1-92.userapi.com/impf/YBYobMlmH7i4olyAF3Qjq8wbbJGTOku0HgLyjQ/k421Ocb6GP0.jpg?size=1920x768&quality=95&crop=40,187,917,366&sign=7088facfc787a11ac7a390d00b719624&type=cover_group'); background-size: cover; background-position: center;">
+            <h2>уже захотел себе тату?</h2>
+            <p class="lead mb-4">запишись к нам прямо сейчас</p>
+            <button class="btn btn-outline-dark btn-lg" onclick="alert('форма записи скоро будет')">
+                тык
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
