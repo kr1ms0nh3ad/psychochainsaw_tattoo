@@ -1,46 +1,47 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Личный кабинет {{ master.name }} - PSYCHO CHAINSAW{% endblock %}
+{% block title %}「 ЛИЧНЫЙ КАБИНЕТ 」{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-3">
         <div class="card mb-4">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Профиль мастера</h5>
+                <h5 class="mb-0">「 ПРОФИЛЬ МАСТЕРА」</h5>
             </div>
             <div class="card-body text-center">
                 {% if master.photo %}
                     <img src="{{ master.photo.url }}" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
                 {% else %}
                     <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
-                        <span class="display-1">👤</span>
+                        <span class="display-1">「 НЕТ ФОТО 」</span>
                     </div>
                 {% endif %}
                 
                 <h4>{{ master.name }}</h4>
                 <p class="badge bg-primary">{{ master.specialty }}</p>
-                <p class="text-muted">Опыт: {{ master.experience }} лет</p>
+                {% load ru_plural %}
+                <p class="text-muted">опыт: {{ master.experience }} {{ master.experience|ru_plural:"год,года,лет" }}</p>
                 <p><small>{{ master.phone }}</small></p>
                 
                 <hr>
                 
                 <div class="d-grid gap-2">
-                    <a href="{% url 'master_portfolio' %}" class="btn btn-outline-primary btn-sm">🖼️ Мое портфолио</a>
-                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Выйти</a>
+                    <a href="{% url 'master_portfolio' %}" class="btn btn-outline-primary btn-sm">мое портфолио</a>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">выйти</a>
                 </div>
             </div>
         </div>
         
         <div class="card">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Статистика</h5>
+                <h5 class="mb-0">「 СТАТИСТИКА 」</h5>
             </div>
             <div class="card-body">
-                <p><strong>Всего записей:</strong> {{ total_appointments }}</p>
-                <p><strong>Выполнено:</strong> {{ completed_appointments }}</p>
-                <p><strong>Ожидают:</strong> {{ pending_appointments }}</p>
+                <p><strong>всего записей:</strong> {{ total_appointments }}</p>
+                <p><strong>выполнено:</strong> {{ completed_appointments }}</p>
+                <p><strong>ожидают:</strong> {{ pending_appointments }}</p>
             </div>
         </div>
     </div>
@@ -48,7 +49,7 @@
     <div class="col-md-9">
         <div class="card mb-4">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">📅 Предстоящие записи</h5>
+                <h5 class="mb-0">「 ПРЕДСТОЯЩИЕ ЗАПИСИ 」</h5>
             </div>
             <div class="card-body">
                 {% if upcoming_appointments %}
@@ -56,11 +57,14 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Дата и время</th>
-                                    <th>Клиент</th>
-                                    <th>Услуга</th>
-                                    <th>Статус</th>
-                                    <th>Действия</th>
+                                    <th>дата и время</th>
+                                    <th>клиент</th>
+                                    <th>услуга</th>
+                                    <th>эскиз</th>
+                                    <th>согласие</th>
+                                    <th>примечания</th>
+                                    <th>статус</th>
+                                    <th>действия</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -73,24 +77,51 @@
                                     </td>
                                     <td>{{ appointment.service.name }}</td>
                                     <td>
+                                        {% if appointment.photo %}
+                                            <a href="{{ appointment.photo.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                                посмотреть
+                                            </a> 
+                                        {% else %}
+                                            нету
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if appointment.client.needs_consent %}
+                                            {# Клиенту меньше 18 лет #}
+                                            {% if appointment.client.parental_consent %}
+                                                <a href="{{ appointment.client.parental_consent.url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                    согласие
+                                                </a>
+                                            {% else %}
+                                                <span class="badge bg-danger">нет согласия!</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {# Клиенту 18 или больше #}
+                                            <span class="badge bg-success">18+</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ appointment.notes }}
+                                    </td>
+                                    <td>
                                         {% if appointment.status == 'pending' %}
-                                            <span class="badge bg-warning">Ожидание</span>
+                                            <span class="badge bg-warning">ожидание</span>
                                         {% elif appointment.status == 'confirmed' %}
-                                            <span class="badge bg-success">Подтвержден</span>
+                                            <span class="badge bg-success">подтвержден</span>
                                         {% elif appointment.status == 'completed' %}
-                                            <span class="badge bg-info">Выполнен</span>
+                                            <span class="badge bg-info">выполнен</span>
                                         {% elif appointment.status == 'cancelled' %}
-                                            <span class="badge bg-danger">Отменен</span>
+                                            <span class="badge bg-danger">отменен</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <form method="post" action="{% url 'update_appointment_status' appointment.id %}" style="display: inline;">
                                             {% csrf_token %}
                                             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                <option value="">Изменить</option>
-                                                <option value="confirmed">Подтвердить</option>
-                                                <option value="completed">Выполнено</option>
-                                                <option value="cancelled">Отменить</option>
+                                                <option value="">изменить</option>
+                                                <option value="confirmed">подтвердить</option>
+                                                <option value="completed">выполнено</option>
+                                                <option value="cancelled">отменить</option>
                                             </select>
                                         </form>
                                     </td>
@@ -100,14 +131,14 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-muted">Нет предстоящих записей</p>
+                    <p class="text-muted">нет предстоящих записей</p>
                 {% endif %}
             </div>
         </div>
         
         <div class="card">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">📋 История записей</h5>
+                <h5 class="mb-0">「 ИСТОРИЯ ЗАПИСЕЙ 」</h5>
             </div>
             <div class="card-body">
                 {% if past_appointments %}
@@ -115,10 +146,10 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Дата</th>
-                                    <th>Клиент</th>
-                                    <th>Услуга</th>
-                                    <th>Статус</th>
+                                    <th>дата</th>
+                                    <th>клиент</th>
+                                    <th>услуга</th>
+                                    <th>статус</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -129,9 +160,9 @@
                                     <td>{{ appointment.service.name }}</td>
                                     <td>
                                         {% if appointment.status == 'completed' %}
-                                            <span class="badge bg-info">Выполнен</span>
+                                            <span class="badge bg-info">выполнено</span>
                                         {% elif appointment.status == 'cancelled' %}
-                                            <span class="badge bg-danger">Отменен</span>
+                                            <span class="badge bg-danger">отменено</span>
                                         {% else %}
                                             <span class="badge bg-secondary">{{ appointment.get_status_display }}</span>
                                         {% endif %}
@@ -142,7 +173,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-muted">История записей пуста</p>
+                    <p class="text-muted">история записей пуста</p>
                 {% endif %}
             </div>
         </div>

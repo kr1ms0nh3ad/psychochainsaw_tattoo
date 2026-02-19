@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="p-5 mb-4 rounded-3" style="background-image: url('')">
-        <div class="container-fluid py-5">
+        <div class="container-fluid py-5" style="background-image: url('https://sun1-92.userapi.com/impf/YBYobMlmH7i4olyAF3Qjq8wbbJGTOku0HgLyjQ/k421Ocb6GP0.jpg?size=1920x768&quality=95&crop=40,187,917,366&sign=7088facfc787a11ac7a390d00b719624&type=cover_group'); background-size: cover; background-position: center;">
             <h1 class="display-5 fw-bold" style="color: rgb(62, 62, 62);">тату-салон「 PSYCHO CHAINSAW 」</h1>
             <p class="col-md-8 fs-4" style="color: rgb(62, 62, 62);">приходите ТОЛЬКО К НАМ!</p>
         </div>
@@ -76,7 +76,8 @@
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ master.name }}</h5>
-                    <p class="card-text">{{ master.specialty }}<br>опыт: {{ master.experience }} лет</p>
+                    {% load ru_plural %}
+                    <p class="card-text">{{ master.specialty }}<br>опыт: {{ master.experience }} {{ master.experience|ru_plural:"год,года,лет" }}</p>
                 </div>
             </div>
         </div>

@@ -28,7 +28,7 @@
                     <p class="mb-2">
                         <strong>длительность:</strong> 
                         {% if service.duration %}
-                            {{ service.duration|time:"H:i" }} часов
+                            {{ service.duration|time:"H:i" }}
                         {% else %}
                             2:00 часа
                         {% endif %}
@@ -47,7 +47,6 @@
                 <div class="mt-4 small text-success">
                     в стоимость включено:
                     <ul class="mt-2">
-                        <li>индивидуальный эскиз</li>
                         <li>стерильные материалы</li>
                         <li>обезболивание</li>
                         <li>средства для ухода</li>
@@ -56,9 +55,9 @@
             </div>
             
             <div class="card-footer bg-transparent border-top-0">
-                <button class="btn btn-primary w-100" onclick="alert('форма записи скоро будет')">
+                <a href="{% url 'book_appointment' %}" class="btn btn-primary w-100">
                     записаться на {{ service.name|lower }}
-                </button>
+                </a>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Appointment, Service, Master
+from .models import Appointment, Service, Master, Vacation
 from django.utils import timezone
 from datetime import datetime
 from django.utils.timezone import make_aware
@@ -8,7 +8,18 @@ class AppointmentForm(forms.Form):
     client_name = forms.CharField(
         label='ваше имя',
         max_length=100,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'леон кеннеди'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иван Иванов'})
+    )
+
+    birth_date = forms.DateField(
+        label='день рождения',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        required=True
+    )
+
+    parental_consent = forms.FileField(
+        label='согласие родителей',
+        widget=forms.FileInput(attrs={'class': 'form-control'})
     )
 
     client_phone = forms.CharField(
@@ -46,27 +57,53 @@ class AppointmentForm(forms.Form):
         label='желаемое время',
         widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'})
     )
+
+    photo = forms.FileField(
+        label='желаемый эскиз',
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
     
     notes = forms.CharField(
         label='дополнительные пожелания',
         required=False,
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'может вы что-то еще хотите.......'})
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'опишите идею, размер, место на теле'})
     )
     
     def clean(self):
         cleaned_data = super().clean()
+
+        birth_date = cleaned_data.get('birth_date')
+        parental_consent = self.files.get('parental_consent')
+        
+        if birth_date:
+            today = datetime.today()
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+            
+            if age < 18 and not parental_consent:
+                raise forms.ValidationError(
+                    "вам меньше 18 лет. для записи необходимо приложить согласие родителей!"
+                )
+
         date = cleaned_data.get('date')
         time = cleaned_data.get('time')
         master = cleaned_data.get('master')
         
+        if date and master:
+            in_vacation = Vacation.objects.filter(
+                master=master,
+                start_date__lte=date,
+                end_date__gte=date
+            ).exists()
+
+        if in_vacation:
+            raise forms.ValidationError("выбранный вами мастер сейчас в отпуске, перенесите сеанс или выберите другого мастера")
+
         if date and date < timezone.now().date():
             raise forms.ValidationError("ну нельзя выбрать прошедшую дату")
-        
-        # Проверка на занятость мастера (упрощенная)
+
         if date and time and master:
             
             dt = datetime.combine(date, time)
-            # Делаем дату временной зоны
             dt_aware = make_aware(dt)
             
             existing = Appointment.objects.filter(

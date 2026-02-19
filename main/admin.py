@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Master, Service, Client, Appointment, MasterWork
+from .models import Master, Service, Client, Appointment, MasterWork, Vacation
 
 @admin.register(Master)
 class MasterAdmin(admin.ModelAdmin):
@@ -14,9 +14,20 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'email', 'registered_at')
+    list_display = ('name', 'phone', 'email', 'registered_at', 'birth_date', 'age', 'needs_consent', 'parental_consent')
     search_fields = ('name', 'phone', 'email')
     list_filter = ('registered_at',)
+
+    def age(self, obj):
+        return obj.age()
+    
+    age.short_description = "Возраст"
+    
+    def needs_consent(self, obj):
+        return obj.needs_consent()
+    
+    needs_consent.boolean = True
+    needs_consent.short_description = "Нужно согласие"
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
@@ -30,3 +41,8 @@ class MasterWorkAdmin(admin.ModelAdmin):
     list_display = ('title', 'master', 'category', 'created_at')
     list_filter = ('master', 'category', 'body_part')
     search_fields = ('title', 'description')
+
+@admin.register(Vacation)
+class VacationAdmin(admin.ModelAdmin):
+    list_display = ('master', 'start_date', 'end_date', 'reason')
+    list_filter = ('master', 'start_date')

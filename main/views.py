@@ -6,7 +6,8 @@ from django.utils.timezone import make_aware
 
 def index(request):
     """главная страница с мастерами и услугами"""
-    masters = Master.objects.filter(is_active=True)[:4]
+    # masters = Master.objects.filter(is_active=True)[:4]
+    masters = Master.objects.all()[:4]
     services = Service.objects.all()[:6]
     context = {
         'masters': masters,
@@ -16,7 +17,8 @@ def index(request):
 
 def masters_list(request):
     """список всех мастеров"""
-    masters = Master.objects.filter(is_active=True)
+    # masters = Master.objects.filter(is_active=True)
+    masters = Master.objects.all()[:4]
     return render(request, 'main/masters.html', {'masters': masters})
 
 def services_list(request):
@@ -27,16 +29,28 @@ def services_list(request):
 def book_appointment(request):
     """форма записи на сеанс"""
     if request.method == 'POST':
-        form = AppointmentForm(request.POST)
+        form = AppointmentForm(request.POST, request.FILES)
         if form.is_valid():
             phone = form.cleaned_data['client_phone']
             client, created = Client.objects.get_or_create(
                 phone=phone,
                 defaults={
                     'name': form.cleaned_data['client_name'],
-                    'email': form.cleaned_data['client_email']
+                    'email': form.cleaned_data['client_email'],
+                    'birth_date': form.cleaned_data['birth_date'],
                 }
             )
+
+            if not created:
+                client.name = form.cleaned_data['client_name']
+                client.email = form.cleaned_data['client_email']
+                client.birth_date = form.cleaned_data['birth_date']
+                
+                # сохраняем согласие, если загрузили
+                if form.cleaned_data.get('parental_consent'):
+                    client.parental_consent = form.cleaned_data['parental_consent']
+                
+                client.save()
             
             dt = datetime.combine(
                 form.cleaned_data['date'],
@@ -49,6 +63,7 @@ def book_appointment(request):
                 master=form.cleaned_data['master'],
                 service=form.cleaned_data['service'],
                 date_time=dt_aware,
+                photo=form.cleaned_data['photo'],
                 notes=form.cleaned_data['notes'],
                 status='pending'
             )
@@ -57,6 +72,9 @@ def book_appointment(request):
     else:
         form = AppointmentForm()
     
+    print("FILES:", request.FILES)
+    print("parental_consent in FILES:", 'parental_consent' in request.FILES)
+
     return render(request, 'main/book.html', {'form': form})
 
 def booking_success(request, appointment_id):
@@ -66,7 +84,9 @@ def booking_success(request, appointment_id):
 
 def master_detail(request, master_id):
     """страница конкретного мастера с его портфолио"""
-    master = get_object_or_404(Master, id=master_id, is_active=True)
+    # master = get_object_or_404(Master, id=master_id, is_active=True)
+    
+    master = get_object_or_404(Master, id=master_id)
     
     portfolio = MasterWork.objects.filter(master=master).order_by('-created_at')
     
@@ -86,8 +106,9 @@ def master_detail(request, master_id):
 
 def index(request):
     """главная страница: показывает мастеров, услуги и последние работы"""
-    masters = Master.objects.filter(is_active=True)[:4]  # Первые 4 мастера
-    services = Service.objects.all()[:6]  # Первые 6 услуг
+    # masters = Master.objects.filter(is_active=True)[:4] 
+    masters = Master.objects.all()[:4]
+    services = Service.objects.all()[:6]  
     
     # последние 8 работ из портфолио (всех мастеров)
     latest_works = MasterWork.objects.select_related('master').all().order_by('-created_at')[:8]
@@ -98,5 +119,7 @@ def index(request):
         'latest_works': latest_works,
     }
     return render(request, 'main/index.html', context)
+
+
 
 print("\033[32m[ ONLINE http://127.0.0.1:8000/ ]\033[0m")

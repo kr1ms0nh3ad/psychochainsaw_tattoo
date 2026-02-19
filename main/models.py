@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -8,7 +9,22 @@ class Master(models.Model):
     experience = models.PositiveIntegerField("Опыт (лет)", default=1)
     phone = models.CharField("Телефон", max_length=20)
     photo = models.ImageField("Фото", upload_to='masters/', null=True, blank=True)
-    is_active = models.BooleanField("Работает", default=True)
+    is_active = models.BooleanField("Работает в салоне", default=True)
+
+    def current_vacation(self):
+        today = datetime.now()
+
+        return self.vacations.filter(
+            start_date__lte=today,
+            end_date__gte=today
+        ).first()
+    
+    def is_on_vacation(self):
+        return self.current_vacation() is not None
+    
+    def vacation_until(self):
+        vacation = self.current_vacation()
+        return vacation.end_date if vacation else None
 
     def __str__(self):
         return self.name
@@ -33,10 +49,30 @@ class Service(models.Model):
 
 class Client(models.Model):
     name = models.CharField("Имя", max_length=100)
+    birth_date = models.DateField("Дата рождения", null=True, blank=True)
     phone = models.CharField("Телефон", max_length=20, unique=True)
     email = models.EmailField("Email", blank=True, null=True)
     comment = models.TextField("Комментарий", blank=True, null=True)
     registered_at = models.DateTimeField("Дата регистрации", auto_now_add=True)
+    parental_consent = models.FileField(
+        "cогласие родителей",
+        upload_to='consents/',
+        null=True,
+        blank=True,
+        help_text="cкан или фото согласия (для клиентов до 18 лет)"
+    )
+
+    def age(self):
+        """dозвращает возраст клиента"""
+        if not self.birth_date:
+            return None
+        today = datetime.today()
+        return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
+    
+    def needs_consent(self):
+        """проверяет, нужно ли согласие"""
+        age = self.age()
+        return age is not None and age < 18
 
     def __str__(self):
         return f"{self.name} ({self.phone})"
@@ -59,6 +95,7 @@ class Appointment(models.Model):
     date_time = models.DateTimeField("Дата и время")
     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField("Дата создания записи", auto_now_add=True)
+    photo = models.ImageField("Желаемый эскиз", upload_to='sketches/', null=False, blank=True)
     notes = models.TextField("Примечания", blank=True, null=True)
 
     def __str__(self):
@@ -86,3 +123,16 @@ class MasterWork(models.Model):
         verbose_name = "Работа мастера"
         verbose_name_plural = "Портфолио мастеров"
         ordering = ['-created_at']
+
+class Vacation(models.Model):
+    master = models.ForeignKey(Master, on_delete=models.CASCADE, related_name='vacations', verbose_name="Мастер")
+    start_date = models.DateField("Начало отпуска")
+    end_date = models.DateField("Конец отпуска")
+    reason = models.CharField("Причина", max_length=200, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.master.name}: {self.start_date} - {self.end_date}"
+
+    class Meta:
+        verbose_name = "Отпуск"
+        verbose_name_plural = "Отпуска"

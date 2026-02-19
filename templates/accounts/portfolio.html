@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Портфолио {{ master.name }} - PSYCHO CHAINSAW{% endblock %}
+{% block title %}「 ПОРТФОЛИО 」{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-8">
-        <h1 class="display-5 fw-bold">🎨 Портфолио {{ master.name }}</h1>
+        <h1 class="display-5 fw-bold">{{ master.name }}</h1>
     </div>
     <div class="col-md-4 text-end">
         <a href="{% url 'add_portfolio_work' %}" class="btn btn-primary btn-lg">
-            + Добавить работу
+            + добавить работу
         </a>
     </div>
 </div>
@@ -18,7 +18,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <a href="{% url 'master_dashboard' %}" class="btn btn-outline-secondary">
-            ← Назад в личный кабинет
+            назад в ЛК
         </a>
     </div>
 </div>
@@ -33,7 +33,7 @@
                  style="height: 250px; object-fit: cover;">
             {% else %}
             <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
-                <span class="display-3">🖼️</span>
+                <span class="display-3"></span>
             </div>
             {% endif %}
             
@@ -53,7 +53,7 @@
                 </div>
                 
                 <p class="card-text mt-2">
-                    <small class="text-muted">Добавлено: {{ work.created_at|date:"d.m.Y" }}</small>
+                    <small class="text-muted">добавлено: {{ work.created_at|date:"d.m.Y" }}</small>
                 </p>
             </div>
             
@@ -62,7 +62,7 @@
                       onsubmit="return confirm('Удалить эту работу из портфолио?');">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-                        Удалить
+                        удалить
                     </button>
                 </form>
             </div>
@@ -73,11 +73,11 @@
 {% else %}
 <div class="card">
     <div class="card-body text-center py-5">
-        <span class="display-1">🖼️</span>
-        <h3 class="mt-3">У вас пока нет работ в портфолио</h3>
-        <p class="text-muted">Добавьте свои лучшие работы, чтобы клиенты могли их увидеть</p>
+        <span class="display-1"></span>
+        <h3 class="mt-3">пока в портфолио ничего нет</h3>
+        <p class="text-muted">добавьте свои лучшие работы, чтобы клиенты могли ими восхититься</p>
         <a href="{% url 'add_portfolio_work' %}" class="btn btn-primary btn-lg mt-3">
-            + Добавить первую работу
+            + добавить первую работу
         </a>
     </div>
 </div>

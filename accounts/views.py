@@ -3,35 +3,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from .forms import MasterRegistrationForm, LoginForm, PortfolioForm
+from .forms import LoginForm, PortfolioForm
 from main.models import Master, Appointment, MasterWork
-
-def register_master(request):
-    if request.method == 'POST':
-        form = MasterRegistrationForm(request.POST)
-        if form.is_valid():
-            # Создаем пользователя
-            user = form.save()
-            
-            # Создаем профиль мастера
-            master = Master.objects.create(
-                user=user,
-                name=f"{form.cleaned_data['first_name']} {form.cleaned_data['last_name']}",
-                specialty=form.cleaned_data['specialty'],
-                experience=form.cleaned_data['experience'],
-                phone=form.cleaned_data['phone'],
-                email=form.cleaned_data['email'],
-                is_active=True
-            )
-            
-            # Сразу логиним
-            login(request, user)
-            messages.success(request, 'Регистрация успешна! Добро пожаловать в PSYCHO CHAINSAW!')
-            return redirect('master_dashboard')
-    else:
-        form = MasterRegistrationForm()
-    
-    return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -42,7 +15,7 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # Проверяем, есть ли у пользователя профиль мастера
+                # проверяем, есть ли у пользователя профиль мастера
                 try:
                     master = Master.objects.get(user=user)
                     return redirect('master_dashboard')
@@ -60,29 +33,29 @@ def logout_view(request):
 
 @login_required
 def master_dashboard(request):
-    # Получаем профиль мастера
+    # получаем профиль мастера
     try:
         master = Master.objects.get(user=request.user)
     except Master.DoesNotExist:
         return redirect('index')
     
-    # Получаем записи к этому мастеру
+    # получаем записи к этому мастеру
     today = timezone.now().date()
     
-    # Предстоящие записи
+    # предстоящие записи
     upcoming_appointments = Appointment.objects.filter(
         master=master,
         date_time__date__gte=today,
         status__in=['pending', 'confirmed']
     ).order_by('date_time')
     
-    # Прошедшие записи
+    # прошедшие записи
     past_appointments = Appointment.objects.filter(
         master=master,
         date_time__date__lt=today
     ).order_by('-date_time')[:10]
     
-    # Статистика
+    # статистика
     total_appointments = Appointment.objects.filter(master=master).count()
     completed_appointments = Appointment.objects.filter(master=master, status='completed').count()
     pending_appointments = Appointment.objects.filter(master=master, status='pending').count()
@@ -101,7 +74,7 @@ def master_dashboard(request):
 def update_appointment_status(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
     
-    # Проверяем, что это мастер этого appointment
+    # проверяем, что это мастер для этой записи
     if appointment.master.user != request.user:
         messages.error(request, 'У вас нет прав для этого действия')
         return redirect('master_dashboard')

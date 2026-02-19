@@ -10,13 +10,8 @@
                 <h2 class="mb-0">「 ЗАПИСЬ НА СЕАНС 」</h2>
             </div>
             <div class="card-body">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
                 
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     <h4 class="mb-3">личные данные</h4>
@@ -28,6 +23,24 @@
                                 <div class="text-danger">{{ form.client_name.errors }}</div>
                             {% endif %}
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                {{ form.birth_date.label_tag }}
+                                {{ form.birth_date }}
+                                <small class="text-muted">для проверки возраста</small>
+                                {% if form.birth_date.errors %}
+                                    <div class="text-danger">{{ form.birth_date.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div id="consentField" class="mb-3" style="display: none;">
+                                {{ form.parental_consent.label_tag }}
+                                {{ form.parental_consent }}
+                                <small class="text-muted">загрузите скан или фото согласия (обязательно для клиентов до 18 лет)</small>
+                                {% if form.parental_consent.errors %}
+                                    <div class="text-danger">{{ form.parental_consent.errors }}</div>
+                                {% endif %}
+                        </div>
                         <div class="col-md-6 mb-3">
                             {{ form.client_phone.label_tag }}
                             {{ form.client_phone }}
@@ -37,14 +50,14 @@
                         </div>
                     </div>
                     
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         {{ form.client_email.label_tag }}
                         {{ form.client_email }}
                         <small class="text-muted">для отправки подтверждения (необязательно)</small>
                         {% if form.client_email.errors %}
                             <div class="text-danger">{{ form.client_email.errors }}</div>
                         {% endif %}
-                    </div>
+                    </div> -->
                     
                     <h4 class="mb-3 mt-4">детали записи</h4>
                     
@@ -84,9 +97,16 @@
                     </div>
                     
                     <div class="mb-3">
+                        {{ form.photo.label_tag }}
+                        {{ form.photo }}
+                        {% if form.photo.errors %}
+                            <div class="text-danger">{{ form.photo.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
                         {{ form.notes.label_tag }}
                         {{ form.notes }}
-                        <small class="text-muted">опишите идею, размер, место на теле</small>
                         {% if form.notes.errors %}
                             <div class="text-danger">{{ form.notes.errors }}</div>
                         {% endif %}
@@ -106,4 +126,27 @@
         </div>
     </div>
 </div>
+
+<script>
+    // показываем поле согласия, если возраст меньше 18
+    document.getElementById('id_birth_date').addEventListener('change', function() {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        
+        const consentField = document.getElementById('consentField');
+        if (age < 18) {
+            consentField.style.display = 'block';
+            document.getElementById('id_parental_consent').required = true;
+        } else {
+            consentField.style.display = 'none';
+            document.getElementById('id_parental_consent').required = false;
+        }
+    });
+</script>
 {% endblock %}
