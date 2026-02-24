@@ -136,3 +136,28 @@ class Vacation(models.Model):
     class Meta:
         verbose_name = "Отпуск"
         verbose_name_plural = "Отпуска"
+
+class Availability(models.Model):
+    DAYS_OF_WEEK = [
+        (0, 'Понедельник'),
+        (1, 'Вторник'),
+        (2, 'Среда'),
+        (3, 'Четверг'),
+        (4, 'Пятница'),
+        (5, 'Суббота'),
+        (6, 'Воскресенье'),
+    ]
+
+    master = models.ForeignKey('Master', on_delete=models.CASCADE, related_name='availabilities')
+    day_of_week = models.IntegerField(choices=DAYS_OF_WEEK, verbose_name="День недели")
+    start_time = models.TimeField("Начало работы")
+    end_time = models.TimeField("Конец работы")
+    is_active = models.BooleanField("Активно", default=True)
+
+    class Meta:
+        verbose_name = "Расписание"
+        verbose_name_plural = "Расписания"
+        unique_together = ['master', 'day_of_week']
+
+    def __str__(self):
+        return f"{self.master.name} - {self.get_day_of_week_display()}: {self.start_time}-{self.end_time}"

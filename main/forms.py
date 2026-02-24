@@ -19,7 +19,8 @@ class AppointmentForm(forms.Form):
 
     parental_consent = forms.FileField(
         label='согласие родителей',
-        widget=forms.FileInput(attrs={'class': 'form-control'})
+        widget=forms.FileInput(attrs={'class': 'form-control'}),
+        required=False
     )
 
     client_phone = forms.CharField(
@@ -49,8 +50,9 @@ class AppointmentForm(forms.Form):
     )
     
     date = forms.DateField(
-        label='желаемая дата',
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'min': timezone.now().date()})
+        label='Желаемая дата',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        required=True
     )
     
     time = forms.TimeField(

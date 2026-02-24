@@ -11,7 +11,7 @@
             </div>
             <div class="card-body">
                 
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="bookingForm">
                     {% csrf_token %}
                     
                     <h4 class="mb-3">личные данные</h4>
@@ -23,24 +23,28 @@
                                 <div class="text-danger">{{ form.client_name.errors }}</div>
                             {% endif %}
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6 mb-3">
-                                {{ form.birth_date.label_tag }}
-                                {{ form.birth_date }}
-                                <small class="text-muted">для проверки возраста</small>
-                                {% if form.birth_date.errors %}
-                                    <div class="text-danger">{{ form.birth_date.errors }}</div>
-                                {% endif %}
-                            </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.birth_date.label_tag }}
+                            {{ form.birth_date }}
+                            <small class="text-muted">для проверки возраста</small>
+                            {% if form.birth_date.errors %}
+                                <div class="text-danger">{{ form.birth_date.errors }}</div>
+                            {% endif %}
                         </div>
-                        <div id="consentField" class="mb-3" style="display: none;">
-                                {{ form.parental_consent.label_tag }}
-                                {{ form.parental_consent }}
-                                <small class="text-muted">загрузите скан или фото согласия (обязательно для клиентов до 18 лет)</small>
-                                {% if form.parental_consent.errors %}
-                                    <div class="text-danger">{{ form.parental_consent.errors }}</div>
-                                {% endif %}
-                        </div>
+                    </div>
+                    
+                    <!-- Поле для согласия -->
+                    <div id="consentField" class="mb-3" style="display: none;">
+                        {{ form.parental_consent.label_tag }}
+                        {{ form.parental_consent }}
+                        <small class="text-muted">загрузите скан или фото согласия (обязательно для клиентов до 18 лет)</small>
+                        {% if form.parental_consent.errors %}
+                            <div class="text-danger">{{ form.parental_consent.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-3">
                         <div class="col-md-6 mb-3">
                             {{ form.client_phone.label_tag }}
                             {{ form.client_phone }}
@@ -48,16 +52,16 @@
                                 <div class="text-danger">{{ form.client_phone.errors }}</div>
                             {% endif %}
                         </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.client_email.label_tag }}
+                            {{ form.client_email }}
+                            <small class="text-muted">для отправки подтверждения</small>
+                            {% if form.client_email.errors %}
+                                <div class="text-danger">{{ form.client_email.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
-                    
-                    <!-- <div class="mb-3">
-                        {{ form.client_email.label_tag }}
-                        {{ form.client_email }}
-                        <small class="text-muted">для отправки подтверждения (необязательно)</small>
-                        {% if form.client_email.errors %}
-                            <div class="text-danger">{{ form.client_email.errors }}</div>
-                        {% endif %}
-                    </div> -->
                     
                     <h4 class="mb-3 mt-4">детали записи</h4>
                     
@@ -69,6 +73,7 @@
                                 <div class="text-danger">{{ form.service.errors }}</div>
                             {% endif %}
                         </div>
+                        
                         <div class="col-md-6 mb-3">
                             {{ form.master.label_tag }}
                             {{ form.master }}
@@ -78,25 +83,51 @@
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3">
-                            {{ form.date.label_tag }}
-                            {{ form.date }}
-                            {% if form.date.errors %}
-                                <div class="text-danger">{{ form.date.errors }}</div>
-                            {% endif %}
+                    <!-- Простой календарь -->
+                    <div id="calendar-container" style="display: none; margin: 20px 0;">
+                        <h5>Выберите дату:</h5>
+                        
+                        <!-- Навигация по месяцам -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <button type="button" class="btn btn-sm btn-dark" id="prevMonth">←</button>
+                            <h6 id="currentMonthYear"></h6>
+                            <button type="button" class="btn btn-sm btn-dark" id="nextMonth">→</button>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.time.label_tag }}
-                            {{ form.time }}
-                            <small class="text-muted">рабочее время: 10:00 - 20:00</small>
-                            {% if form.time.errors %}
-                                <div class="text-danger">{{ form.time.errors }}</div>
-                            {% endif %}
+                        
+                        <!-- Сетка календаря -->
+                        <table class="table table-bordered text-center" id="calendar-table">
+                            <thead>
+                                <tr>
+                                    <th>Пн</th>
+                                    <th>Вт</th>
+                                    <th>Ср</th>
+                                    <th>Чт</th>
+                                    <th>Пт</th>
+                                    <th>Сб</th>
+                                    <th>Вс</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendar-body">
+                                <!-- Заполняется через JS -->
+                            </tbody>
+                        </table>
+                        
+                        <input type="hidden" name="date" id="selectedDate">
+                        <div id="selectedDateDisplay" class="text-muted mt-2"></div>
+                    </div>
+                    
+                    <!-- Доступное время -->
+                    <div id="time-container" style="display: none; margin-top: 20px;">
+                        <h5>Доступное время:</h5>
+                        <div id="time-buttons" class="d-flex flex-wrap gap-2"></div>
+                        <input type="hidden" name="time" id="selectedTime">
+                        
+                        <div id="no-slots-message" class="alert alert-warning mt-3" style="display: none;">
+                            На выбранную дату нет свободного времени
                         </div>
                     </div>
                     
-                    <div class="mb-3">
+                    <div class="mb-3 mt-4">
                         {{ form.photo.label_tag }}
                         {{ form.photo }}
                         {% if form.photo.errors %}
@@ -127,8 +158,143 @@
     </div>
 </div>
 
+<style>
+    #calendar-table {
+        background: #2d2d2d;
+        color: #e0e0e0;
+        border-color: #404040;
+    }
+    
+    #calendar-table td {
+        padding: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    
+    #calendar-table td:hover {
+        background: #c41e1e;
+        color: white;
+    }
+    
+    #calendar-table td.disabled {
+        background: #1a1a1a;
+        color: #666;
+        cursor: not-allowed;
+    }
+    
+    #calendar-table td.disabled:hover {
+        background: #1a1a1a;
+        color: #666;
+    }
+    
+    #calendar-table td.selected {
+        background: #c41e1e;
+        color: white;
+        font-weight: bold;
+    }
+    
+    #calendar-table td.vacation {
+        background: #6c757d;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    #calendar-table td.busy {
+        background: #dc3545;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    #calendar-table td.vacation:hover,
+    #calendar-table td.busy:hover {
+        opacity: 1;
+    }
+    
+    .btn-outline-primary {
+        border-color: #c41e1e;
+        color: #c41e1e;
+    }
+    
+    .btn-outline-primary:hover,
+    .btn-outline-primary.active {
+        background-color: #c41e1e;
+        border-color: #c41e1e;
+        color: white;
+    }
+    
+    .btn-dark {
+        background-color: #2d2d2d;
+        border-color: #404040;
+    }
+    
+    .btn-dark:hover {
+        background-color: #404040;
+    }
+
+    /* Прошедшие дни */
+    #calendar-table td.past-day {
+        background: #2a2a2a;
+        color: #666;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    /* Отпуск */
+    #calendar-table td.vacation-day {
+        background: #6c757d;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    /* Полностью занятые дни */
+    #calendar-table td.busy-day {
+        background: #dc3545;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    /* Есть свободные слоты */
+    #calendar-table td.available-day {
+        background: #28a745;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #calendar-table td.available-day:hover {
+        background: #218838;
+    }
+
+    /* Нет свободных слотов */
+    #calendar-table td.no-slots-day {
+        background: #ffc107;
+        color: #000;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    /* Данные загружаются */
+    #calendar-table td.unknown-day {
+        background: #17a2b8;
+        color: white;
+        opacity: 0.7;
+    }
+
+    /* Выбранный день */
+    #calendar-table td.selected {
+        background: #c41e1e !important;
+        color: white !important;
+        font-weight: bold;
+        border: 2px solid white;
+    }
+</style>
+
+
 <script>
-    // показываем поле согласия, если возраст меньше 18
     document.getElementById('id_birth_date').addEventListener('change', function() {
         const birthDate = new Date(this.value);
         const today = new Date();
@@ -139,14 +305,329 @@
             age--;
         }
         
-        const consentField = document.getElementById('consentField');
-        if (age < 18) {
-            consentField.style.display = 'block';
-            document.getElementById('id_parental_consent').required = true;
+        document.getElementById('consentField').style.display = age < 18 ? 'block' : 'none';
+    });
+
+    // ========== КАЛЕНДАРЬ ==========
+    let currentDate = new Date();
+    let currentMasterId = null;
+    let vacationData = {};      // Дни в отпуске
+    let busyData = {};          // Полностью занятые дни
+    let availableSlotsCache = {}; // Кэш доступных слотов для дней
+
+    document.getElementById('id_master').addEventListener('change', function() {
+        currentMasterId = this.value;
+        const calendarContainer = document.getElementById('calendar-container');
+        
+        if (!currentMasterId) {
+            calendarContainer.style.display = 'none';
+            return;
+        }
+        
+        calendarContainer.style.display = 'block';
+        
+        // Загружаем данные о занятости мастера
+        loadMasterCalendarData(currentMasterId);
+    });
+    
+    function loadMasterCalendarData(masterId) {
+        const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        
+        const startStr = startDate.toISOString().split('T')[0];
+        const endStr = endDate.toISOString().split('T')[0];
+        
+        fetch(`/api/calendar/${masterId}/?start=${startStr}&end=${endStr}`)
+            .then(res => res.json())
+            .then(events => {
+                vacationData = {};
+                busyData = {};
+                
+                events.forEach(event => {
+                    const date = event.start;  // Формат "2026-02-15"
+                    
+                    if (event.color === '#6c757d' || event.title.includes('Отпуск')) {
+                        vacationData[date] = true;
+                    } else if (event.color === '#dc3545' || event.title.includes('Занято')) {
+                        busyData[date] = true;
+                    }
+                });
+                
+                renderCalendar();
+            })
+            .catch(err => {
+                console.error('Ошибка загрузки данных:', err);
+                renderCalendar();  // Рендерим без данных
+            });
+    }
+    
+    // Функция для проверки доступности конкретного дня
+    function checkDayAvailability(masterId, dateStr) {
+        return fetch(`/api/available-slots/?master_id=${masterId}&date=${dateStr}`)
+            .then(res => res.json())
+            .then(data => {
+                // Сохраняем в кэш
+                availableSlotsCache[dateStr] = data.slots || [];
+                return availableSlotsCache[dateStr];
+            });
+    }
+    
+    async function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        document.getElementById('currentMonthYear').textContent = 
+            new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric' }).format(currentDate);
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        // День недели первого дня (0 = вс, 1 = пн ... 6 = сб)
+        let startDay = firstDay.getDay();
+        if (startDay === 0) startDay = 7; // Делаем воскресенье = 7
+        
+        const totalDays = lastDay.getDate();
+        
+        let tbody = document.getElementById('calendar-body');
+        tbody.innerHTML = '';
+        
+        let row = document.createElement('tr');
+        let cellCount = 1;
+        
+        // Пустые ячейки до первого дня месяца
+        for (let i = 1; i < startDay; i++) {
+            let cell = document.createElement('td');
+            cell.textContent = '';
+            cell.classList.add('disabled');
+            row.appendChild(cell);
+            cellCount++;
+        }
+        
+        // Ячейки с днями
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Создаем массив промисов для загрузки доступности всех дней
+        const dayPromises = [];
+        
+        for (let day = 1; day <= totalDays; day++) {
+            const cellDate = new Date(year, month, day);
+            cellDate.setHours(0, 0, 0, 0);
+            
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            // Если день не прошедший, не отпуск и не полностью занят - проверяем доступность
+            if (cellDate >= today && !vacationData[dateStr] && !busyData[dateStr] && currentMasterId) {
+                // Добавляем промис для загрузки слотов этого дня
+                const promise = checkDayAvailability(currentMasterId, dateStr)
+                    .then(slots => {
+                        return { dateStr, hasSlots: slots.length > 0 };
+                    });
+                dayPromises.push(promise);
+            }
+        }
+        
+        // Ждем загрузки всех данных
+        Promise.all(dayPromises).then(results => {
+            // Создаем карту доступности дней
+            const availabilityMap = {};
+            results.forEach(r => {
+                availabilityMap[r.dateStr] = r.hasSlots;
+            });
+            
+            // Теперь рендерим ячейки с правильными цветами
+            renderCalendarCells(year, month, totalDays, startDay, today, availabilityMap);
+        }).catch(err => {
+            console.error('Ошибка при загрузке доступности дней:', err);
+            // В случае ошибки рендерим без цветов
+            renderCalendarCells(year, month, totalDays, startDay, today, {});
+        });
+    }
+    
+    function renderCalendarCells(year, month, totalDays, startDay, today, availabilityMap) {
+        let tbody = document.getElementById('calendar-body');
+        tbody.innerHTML = '';
+        
+        let row = document.createElement('tr');
+        let cellCount = 1;
+        
+        // Пустые ячейки до первого дня месяца
+        for (let i = 1; i < startDay; i++) {
+            let cell = document.createElement('td');
+            cell.textContent = '';
+            cell.classList.add('disabled');
+            row.appendChild(cell);
+            cellCount++;
+        }
+        
+        for (let day = 1; day <= totalDays; day++) {
+            if (cellCount > 7) {
+                tbody.appendChild(row);
+                row = document.createElement('tr');
+                cellCount = 1;
+            }
+            
+            const cellDate = new Date(year, month, day);
+            cellDate.setHours(0, 0, 0, 0);
+            
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            let cell = document.createElement('td');
+            cell.textContent = day;
+            cell.dataset.date = dateStr;
+            
+            // ОПРЕДЕЛЯЕМ ЦВЕТ ЯЧЕЙКИ
+            if (cellDate < today) {
+                // Прошедшие дни - серые
+                cell.classList.add('past-day');
+                cell.title = 'Прошедшая дата';
+                cell.style.pointerEvents = 'none';
+            } else if (vacationData[dateStr]) {
+                // Отпуск - синие
+                cell.classList.add('vacation-day');
+                cell.title = 'Мастер в отпуске';
+                cell.style.pointerEvents = 'none';
+            } else if (busyData[dateStr]) {
+                // Полностью занятые дни - красные
+                cell.classList.add('busy-day');
+                cell.title = 'День полностью занят';
+                cell.style.pointerEvents = 'none';
+            } else if (availabilityMap[dateStr] === true) {
+                // Есть свободные слоты - зеленые
+                cell.classList.add('available-day');
+                cell.title = 'Есть свободное время';
+            } else if (availabilityMap[dateStr] === false) {
+                // Нет свободных слотов - оранжевые/желтые
+                cell.classList.add('no-slots-day');
+                cell.title = 'Нет свободного времени';
+                cell.style.pointerEvents = 'none';
+            } else {
+                // Данные еще загружаются или ошибка - нейтральные
+                cell.classList.add('unknown-day');
+                cell.title = 'Проверка доступности...';
+            }
+            
+            cell.onclick = function() {
+                if (this.classList.contains('past-day') || 
+                    this.classList.contains('vacation-day') || 
+                    this.classList.contains('busy-day') ||
+                    this.classList.contains('no-slots-day')) {
+                    return;
+                }
+                
+                // Убираем выделение с других дней
+                document.querySelectorAll('#calendar-body td.selected').forEach(td => {
+                    td.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                
+                const selectedDate = this.dataset.date;
+                document.getElementById('selectedDate').value = selectedDate;
+                document.getElementById('selectedDateDisplay').textContent = 
+                    `Выбрана дата: ${new Intl.DateTimeFormat('ru-RU').format(new Date(selectedDate))}`;
+                
+                loadAvailableSlots(currentMasterId, selectedDate);
+            };
+            
+            row.appendChild(cell);
+            cellCount++;
+        }
+        
+        // Заполняем пустые ячейки в конце
+        while (cellCount <= 7) {
+            let cell = document.createElement('td');
+            cell.textContent = '';
+            cell.classList.add('disabled');
+            row.appendChild(cell);
+            cellCount++;
+        }
+        
+        tbody.appendChild(row);
+    }
+    
+    function loadAvailableSlots(masterId, date) {
+        fetch(`/api/available-slots/?master_id=${masterId}&date=${date}`)
+            .then(res => res.json())
+            .then(data => {
+                const timeContainer = document.getElementById('time-container');
+                const timeButtons = document.getElementById('time-buttons');
+                const noSlotsMessage = document.getElementById('no-slots-message');
+                
+                timeButtons.innerHTML = '';
+                document.getElementById('selectedTime').value = '';
+                
+                if (data.slots && data.slots.length > 0) {
+                    data.slots.forEach(time => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn btn-outline-primary btn-sm';
+                        btn.textContent = time;
+                        btn.onclick = function() {
+                            document.querySelectorAll('#time-buttons .btn').forEach(b => {
+                                b.classList.remove('active', 'btn-primary');
+                            });
+                            this.classList.add('active', 'btn-primary');
+                            document.getElementById('selectedTime').value = time;
+                        };
+                        timeButtons.appendChild(btn);
+                    });
+                    
+                    timeContainer.style.display = 'block';
+                    noSlotsMessage.style.display = 'none';
+                } else {
+                    timeContainer.style.display = 'block';
+                    timeButtons.innerHTML = '<p>Нет свободного времени</p>';
+                    noSlotsMessage.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.error('Ошибка:', err);
+            });
+    }
+    
+    document.getElementById('prevMonth').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        if (currentMasterId) {
+            loadMasterCalendarData(currentMasterId);
         } else {
-            consentField.style.display = 'none';
-            document.getElementById('id_parental_consent').required = false;
+            renderCalendar();
+        }
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        if (currentMasterId) {
+            loadMasterCalendarData(currentMasterId);
+        } else {
+            renderCalendar();
+        }
+    });
+    
+    // Валидация перед отправкой
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        const master = document.getElementById('id_master').value;
+        const date = document.getElementById('selectedDate').value;
+        const time = document.getElementById('selectedTime').value;
+        
+        if (!master) {
+            e.preventDefault();
+            alert('Выберите мастера');
+            return;
+        }
+        
+        if (!date) {
+            e.preventDefault();
+            alert('Выберите дату');
+            return;
+        }
+        
+        if (!time) {
+            e.preventDefault();
+            alert('Выберите время');
+            return;
         }
     });
 </script>
+
 {% endblock %}

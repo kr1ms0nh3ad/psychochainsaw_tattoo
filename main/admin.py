@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Master, Service, Client, Appointment, MasterWork, Vacation
+from .models import Availability, Master, Service, Client, Appointment, MasterWork, Vacation
 
 @admin.register(Master)
 class MasterAdmin(admin.ModelAdmin):
@@ -46,3 +46,8 @@ class MasterWorkAdmin(admin.ModelAdmin):
 class VacationAdmin(admin.ModelAdmin):
     list_display = ('master', 'start_date', 'end_date', 'reason')
     list_filter = ('master', 'start_date')
+
+@admin.register(Availability)
+class AvailabilityAdmin(admin.ModelAdmin):
+    list_display = ('master', 'day_of_week', 'start_time', 'end_time', 'is_active')
+    list_filter = ('master', 'day_of_week', 'is_active')
