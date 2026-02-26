@@ -1,0 +1,32 @@
+@startuml
+actor "Мастер" as Master
+participant "login_view" as Login
+participant "master_dashboard" as Dash
+participant "update_appointment_status" as StatusView
+participant "Database" as DB
+
+== Вход в систему ==
+Master -> Login: Вводит логин/пароль
+Login -> DB: Authenticate User
+DB --> Login: User Object
+Login -> DB: Master.objects.get(user=user)
+alt Профиль мастера существует
+    Login --> Master: Redirect /dashboard/
+else Ошибка (не мастер)
+    Login --> Master: Сообщение "Нет прав"
+end
+
+== Работа с записями ==
+Master -> Dash: Открывает Dashboard
+Dash -> DB: Запрос предстоящих записей (date >= today)
+Dash -> DB: Запрос статистики (count)
+DB --> Dash: Данные
+Dash --> Master: Показывает список клиентов и статистику
+
+== Изменение статуса ==
+Master -> StatusView: POST /update_status/ (напр. 'confirmed')
+StatusView -> DB: Проверка прав (master.user == request.user)
+StatusView -> DB: Update Appointment.status
+DB --> StatusView: Успех
+StatusView --> Master: Обновляет страницу (Success message)
+@enduml

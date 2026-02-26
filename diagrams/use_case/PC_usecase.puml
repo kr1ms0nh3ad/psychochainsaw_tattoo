@@ -1,0 +1,54 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Клиент (Гость)" as Client
+actor "Мастер" as Master
+actor "Администратор" as Admin
+
+rectangle "АИС Тату-салона" {
+    
+    ' Функционал клиента
+    usecase "Просмотр списка мастеров" as UC1
+    usecase "Просмотр портфолио работ" as UC2
+    usecase "Просмотр списка услуг" as UC3
+    usecase "Запись на сеанс" as UC4
+    usecase "Загрузка согласия родителей" as UC5
+    usecase "Проверка доступных слотов" as UC6
+    
+    ' Функционал мастера (через приложение accounts)
+    usecase "Авторизация в системе" as UC7
+    usecase "Просмотр статистики и списка записей" as UC8
+    usecase "Управление статусом записи\n(подтверждение/завершение)" as UC9
+    usecase "Управление своим портфолио" as UC10
+    usecase "Добавление новой работы" as UC11
+    
+    ' Функционал администратора (через Django Admin)
+    usecase "Управление мастерами и услугами" as UC12
+    usecase "Ведение базы клиентов" as UC13
+    usecase "Настройка графиков работы и отпусков" as UC14
+    usecase "Полный мониторинг всех записей" as UC15
+
+    ' Связи клиента
+    Client --> UC1
+    Client --> UC2
+    Client --> UC3
+    Client --> UC4
+    UC4 ..> UC6 : <<include>>
+    UC4 <.. UC5 : <<extend>> (если возраст < 18)
+
+    ' Связи мастера
+    Master --> UC7
+    Master --> UC8
+    Master --> UC9
+    Master --> UC10
+    UC10 <.. UC11 : <<include>>
+
+    ' Связи администратора
+    Admin --> UC12
+    Admin --> UC13
+    Admin --> UC14
+    Admin --> UC15
+}
+
+@enduml

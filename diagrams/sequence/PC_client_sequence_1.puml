@@ -1,0 +1,37 @@
+@startuml
+actor "Клиент" as Client
+participant "Браузер (UI)" as Browser
+participant "api_available_slots (View)" as API
+participant "AppointmentForm (Validation)" as Form
+participant "Database" as DB
+
+== Проверка доступного времени (AJAX) ==
+Client -> Browser: Выбирает мастера и дату
+Browser -> API: GET /api/available_slots?master_id=1&date=...
+API -> DB: Поиск Availability и Vacation мастера
+DB --> API: Данные графика
+API -> DB: Поиск занятых Appointment на дату
+DB --> API: Список записей
+API -> API: Вычисление свободных часов
+API --> Browser: JSON {slots: ["10:00", "11:00", ...]}
+Browser --> Client: Показывает доступные кнопки времени
+
+== Отправка формы ==
+Client -> Browser: Заполняет данные и жмет "Записаться"
+Browser -> Form: POST data (вкл. файл эскиза/согласия)
+Form -> Form: clean(): Проверка возраста (<18?)
+Form -> Form: clean(): Проверка наличия согласия
+Form -> DB: Проверка: не в отпуске ли мастер?
+Form -> DB: Проверка: не занято ли время?
+
+alt Валидация успешна
+    Form -> DB: get_or_create Client (по телефону)
+    Form -> DB: Create Appointment (status='pending')
+    DB --> Form: ID записи
+    Form --> Browser: Redirect /booking_success/
+    Browser --> Client: Показ подтверждения
+else Ошибка (занято/нет согласия)
+    Form --> Browser: Показ ошибок (ValidationError)
+    Browser --> Client: Просьба исправить данные
+end
+@startuml
