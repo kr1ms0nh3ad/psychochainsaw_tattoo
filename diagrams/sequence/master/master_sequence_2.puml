@@ -1,0 +1,14 @@
+@startuml
+actor "Мастер" as Master
+participant "Функция добавления работы в портфолио" as AddWork
+participant "Форма добавления работы" as Form
+participant "База данных" as DB
+
+Master -> AddWork: Открывает форму добавления
+AddWork --> Master: Показывает поля (название, запись, категория...)
+Master -> AddWork: Отправляет заполненную форму + фото
+AddWork -> Form: Валидация
+Form -> DB: Сохранение работы с привязкой к текущему мастеру
+DB --> AddWork: Успех
+AddWork --> Master: Перенаправление к списку работ
+@enduml

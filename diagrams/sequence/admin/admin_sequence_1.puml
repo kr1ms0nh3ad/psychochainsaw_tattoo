@@ -1,0 +1,20 @@
+@startuml
+actor "Администратор" as Admin
+participant "Интерфейс админ-панели" as DjangoAdmin
+participant "Модели расписания и отпусков" as Models
+participant "База данных" as DB
+
+== Настройка графика ==
+Admin -> DjangoAdmin: Выбирает мастера в разделе "Расписания"
+Admin -> DjangoAdmin: Устанавливает часы работы
+DjangoAdmin -> Models: Сохранение расписания
+Models -> DB: UPDATE/INSERT
+DB --> Admin: Успех
+
+== Оформление отпуска ==
+Admin -> DjangoAdmin: Создает запись в "Отпуска"
+Admin -> DjangoAdmin: Указывает мастера и интервал дат
+DjangoAdmin -> Models: Сохранение отпуска
+Models -> DB: UPDATE/INSERT
+DB --> Admin: Успех
+@enduml
