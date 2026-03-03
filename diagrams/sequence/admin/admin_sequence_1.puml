@@ -8,13 +8,13 @@ participant "База данных" as DB
 Admin -> DjangoAdmin: Выбирает мастера в разделе "Расписания"
 Admin -> DjangoAdmin: Устанавливает часы работы
 DjangoAdmin -> Models: Сохранение расписания
-Models -> DB: UPDATE/INSERT
+Models -> DB: Обновление/Вставка данных
 DB --> Admin: Успех
 
 == Оформление отпуска ==
 Admin -> DjangoAdmin: Создает запись в "Отпуска"
 Admin -> DjangoAdmin: Указывает мастера и интервал дат
 DjangoAdmin -> Models: Сохранение отпуска
-Models -> DB: UPDATE/INSERT
+Models -> DB: Обновление/Вставка данных
 DB --> Admin: Успех
 @enduml

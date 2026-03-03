@@ -2,7 +2,32 @@ from django import forms
 from .models import Appointment, Service, Master, Vacation
 from django.utils import timezone
 from datetime import datetime
+from django.contrib.auth.models import User
 from django.utils.timezone import make_aware
+
+class MasterCreationForm(forms.ModelForm):
+    # Поля для пользователя
+    username = forms.CharField(max_length=150, label="Логин")
+    password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
+
+    # Поля мастера (всё, что есть в Master)
+    class Meta:
+        model = Master
+        fields = ['name', 'specialty', 'experience', 'phone', 'photo']
+
+    def save(self, commit=True):
+        # 1. Создаём пользователя
+        user = User.objects.create_user(
+            username=self.cleaned_data['username'],
+            password=self.cleaned_data['password'],
+        )
+        
+        # 2. Создаём мастера и привязываем к пользователю
+        master = super().save(commit=False)
+        master.user = user
+        if commit:
+            master.save()
+        return master
 
 class AppointmentForm(forms.Form):
     client_name = forms.CharField(

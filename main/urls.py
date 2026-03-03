@@ -9,4 +9,5 @@ urlpatterns = [
     path('booking/success/<int:appointment_id>/', views.booking_success, name='booking_success'),
     path('master/<int:master_id>/', views.master_detail, name='master_detail'),
     path('api/available-slots/', views.api_available_slots, name='api_available_slots'),
+    path('admin_custom/create_master/', views.admin_create_master, name='admin_create_master'),
 ]

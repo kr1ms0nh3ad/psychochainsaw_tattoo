@@ -3,8 +3,11 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 from .models import Availability, Master, MasterWork, Service, Appointment, Client, Vacation
 from django.views.decorators.http import require_GET
+from django.contrib.admin.views.decorators import staff_member_required
+from .forms import MasterCreationForm
 from .forms import AppointmentForm
 from datetime import datetime, timedelta
+from django.contrib import messages
 from django.utils.timezone import make_aware
 from .utils import get_available_slots
 
@@ -22,7 +25,7 @@ def index(request):
 def masters_list(request):
     """список всех мастеров"""
     # masters = Master.objects.filter(is_active=True)
-    masters = Master.objects.all()[:4]
+    masters = Master.objects.all()
     return render(request, 'main/masters.html', {'masters': masters})
 
 def services_list(request):
@@ -280,7 +283,18 @@ def api_available_slots(request):
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=400)
     
-
+@staff_member_required  # только для админов
+def admin_create_master(request):
+    if request.method == 'POST':
+        form = MasterCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            master = form.save()
+            messages.success(request, f'Мастер {master.name} создан!')
+            return redirect('admin:index')  # или на список мастеров
+    else:
+        form = MasterCreationForm()
+    
+    return render(request, 'admin/create_master.html', {'form': form})
 
 
 print("\033[32m[ ONLINE http://127.0.0.1:8000/ ]\033[0m")

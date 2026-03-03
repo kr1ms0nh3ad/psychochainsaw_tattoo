@@ -5,8 +5,8 @@ participant "Форма добавления работы" as Form
 participant "База данных" as DB
 
 Master -> AddWork: Открывает форму добавления
-AddWork --> Master: Показывает поля (название, запись, категория...)
-Master -> AddWork: Отправляет заполненную форму + фото
+AddWork --> Master: Показывает поля
+Master -> AddWork: Отправляет заполненную форму
 AddWork -> Form: Валидация
 Form -> DB: Сохранение работы с привязкой к текущему мастеру
 DB --> AddWork: Успех

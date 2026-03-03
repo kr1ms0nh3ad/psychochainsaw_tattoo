@@ -19,14 +19,23 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'masters' %}">мастера</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'services' %}">услуги</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'book_appointment' %}">записаться</a></li>
+                    
                     {% if user.is_authenticated %}
+                        {# Для авторизованных #}
                         <li class="nav-item"><a class="nav-link" href="{% url 'master_dashboard' %}">личный кабинет</a></li>
+                        
+                        {# Если пользователь — админ (суперпользователь) #}
+                        {% if user.is_superuser %}
+                            <li class="nav-item"><a class="nav-link text-warning" href="/admin/">админка</a></li>
+                            <li class="nav-item"><a class="nav-link text-info" href="{% url 'admin_create_master' %}">создать мастера</a></li>
+                        {% endif %}
+                        
                         <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}">выйти</a></li>
+                        
                     {% else %}
+                        {# Для неавторизованных #}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">вход для мастеров</a></li>
                     {% endif %}
-                
-                    <li class="nav-item"><a class="nav-link" href="/admin/" style="color: rgb(255, 0, 115);">админка</a></li>
                 </ul>
             </div>
         </div>

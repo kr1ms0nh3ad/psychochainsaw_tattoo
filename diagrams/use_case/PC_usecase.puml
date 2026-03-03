@@ -42,7 +42,7 @@ rectangle "АИС Тату-салона" {
     Master --> UC8
     Master --> UC9
     Master --> UC10
-    UC10 <.. UC11 : <<include>>
+    UC10 ..> UC11 : <<include>>
 
     ' Связи администратора
     Admin --> UC12

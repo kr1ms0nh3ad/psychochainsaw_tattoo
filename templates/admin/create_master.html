@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}「 СОЗДАНИЕ МАСТЕРА 」{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h2 class="mb-0">「 СОЗДАНИЕ МАСТЕРА 」</h2>
+            </div>
+            <div class="card-body">
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <h4 class="mb-3">данные для входа</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">логин</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">пароль</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="mb-3">
+                        <label class="form-label">email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div> -->
+                    
+                    <h4 class="mb-3 mt-4">личные данные</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">имя</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">телефон</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">специализация</label>
+                        {{ form.specialty }}
+                        <small class="text-muted">например: реализм, традиция, графика</small>
+                        {% if form.specialty.errors %}
+                            <div class="text-danger">{{ form.specialty.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">опыт (лет)</label>
+                            {{ form.experience }}
+                            {% if form.experience.errors %}
+                                <div class="text-danger">{{ form.experience.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">фото</label>
+                            {{ form.photo }}
+                            {% if form.photo.errors %}
+                                <div class="text-danger">{{ form.photo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="mb-3">
+                        <label class="form-label">о себе</label>
+                        {{ form.bio }}
+                        <small class="text-muted">необязательно</small>
+                        {% if form.bio.errors %}
+                            <div class="text-danger">{{ form.bio.errors }}</div>
+                        {% endif %}
+                    </div> -->
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+                        создать мастера
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background-color: #2d2d2d;
+        border: 1px solid #404040;
+    }
+    
+    .card-header {
+        border-bottom: 3px solid #c41e1e;
+    }
+    
+    .form-control, .form-select {
+        background-color: #1a1a1a;
+        border: 1px solid #404040;
+        color: #e0e0e0;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: #1a1a1a;
+        border-color: #c41e1e;
+        color: #e0e0e0;
+        box-shadow: 0 0 0 0.2rem rgba(196, 30, 30, 0.25);
+    }
+    
+    .form-control::placeholder {
+        color: #666;
+    }
+    
+    .text-muted {
+        color: #a0a0a0 !important;
+    }
+    
+    .btn-primary {
+        background-color: #c41e1e;
+        border-color: #c41e1e;
+    }
+    
+    .btn-primary:hover {
+        background-color: #a01818;
+        border-color: #a01818;
+    }
+    
+    .text-danger {
+        color: #ff6b6b !important;
+    }
+    
+    h4 {
+        color: #c41e1e;
+        border-left: 3px solid #c41e1e;
+        padding-left: 10px;
+    }
+    
+    label {
+        color: #e0e0e0;
+        font-weight: 500;
+    }
+    
+    /* Стили для файлового инпута */
+    input[type="file"] {
+        padding: 10px;
+        background: #1a1a1a;
+        border: 1px dashed #404040;
+        color: #e0e0e0;
+    }
+    
+    input[type="file"]::-webkit-file-upload-button {
+        background: #c41e1e;
+        border: none;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+    
+    input[type="file"]::-webkit-file-upload-button:hover {
+        background: #a01818;
+    }
+    
+    /* Стили для textarea */
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+</style>
+{% endblock %}
