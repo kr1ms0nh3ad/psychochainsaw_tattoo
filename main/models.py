@@ -52,7 +52,6 @@ class Client(models.Model):
     birth_date = models.DateField("Дата рождения", null=True, blank=True)
     phone = models.CharField("Телефон", max_length=20, unique=True)
     email = models.EmailField("Email", blank=True, null=True)
-    comment = models.TextField("Комментарий", blank=True, null=True)
     registered_at = models.DateTimeField("Дата регистрации", auto_now_add=True)
     parental_consent = models.FileField(
         "cогласие родителей",
